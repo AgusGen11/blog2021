@@ -16,6 +16,11 @@ app.get('/', (req, res) => {
   res.render('index', { posts: posts });
   });
 });
+app.get('/posts/:id', (req, res) => {
+  Post.findById(req.params.id, (err,post) => {
+    res.render('post',{ post: post });
+  });
+});
 app.get('/new', (req, res) => {
   res.render('nuevo_post');
 });
@@ -30,6 +35,21 @@ app.post('/new', (req, res) => {
     res.redirect('/');
   });
 });
+
+app.post('/comments',(req, res) => {
+  console.log('Recibimos:');
+  console.log(req.body);
+  const { name, comment, id } = req.body;
+  const newComment = { name, comment };
+  Post.findById(id, (err,post) => {
+    post.comments.push(newComment);
+    console.log(post);
+    post.save((err, post) => {
+    res.redirect('/posts/' + id);
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`server escuchando en puerto ${PORT}`);
 });
